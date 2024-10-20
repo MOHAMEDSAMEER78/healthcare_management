@@ -81,3 +81,15 @@ cd cloud_server
 python manage.py startapp data_collection
 ```
 
+
+
+List of Virtual Env Required 
+
+python -m venv edge_node_env
+source edge_node_env/bin/activate
+
+python -m venv cloud_server_env
+source cloud_server_env/bin/activate
+
+python -m venv central_edge_node_env
+source central_edge_node_env/bin/activate
