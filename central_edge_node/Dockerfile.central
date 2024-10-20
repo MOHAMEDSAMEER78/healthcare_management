@@ -28,7 +28,7 @@ RUN echo "Recursive contents of /app:" && find /app
 RUN echo "Current working directory:" && pwd
 
 # Expose port 8000 for the Django app
-EXPOSE 8000
+EXPOSE 8001
 
 # Run Django's development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
