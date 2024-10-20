@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'anonymized_data',
-    'patientdata',  # Updated to reflect the correct path
+
 ]
 
 MIDDLEWARE = [

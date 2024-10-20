@@ -1,11 +1,9 @@
 # anonymized_data/models.py
 
 from django.db import models
-from patientdata.models import PatientData  # Import PatientData directly
 
 class AnonymizedPatientData(models.Model):
-    # Use the imported model directly instead of a string reference
-    patient = models.ForeignKey(PatientData, on_delete=models.CASCADE)  
+    patient_id = models.IntegerField()  # Regular integer field 
     name = models.CharField(max_length=100, blank=True)
     age = models.IntegerField()
     heartrate = models.IntegerField(blank=True)
