@@ -21,13 +21,13 @@ services:
     depends_on:
       - edge_node
 
-  # cloud_server:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.cloud
-  #   ports:
-  #     - "8002:8002"
-  #   environment:
-  #     - DJANGO_ENV=development
-  #   depends_on:
-  #     - central_node
+  cloud_server:
+    build:
+      context: .
+      dockerfile: cloud_server/Dockerfile.cloud
+    ports:
+      - "8002:8002"
+    environment:
+      - DJANGO_ENV=development
+    depends_on:
+      - central_node
