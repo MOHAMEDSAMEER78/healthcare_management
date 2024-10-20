@@ -1,0 +1,122 @@
+### Project Todo: **Node Integration in a Healthcare System**
+
+This design document outlines the architecture for integrating IoT nodes (such as wearables and edge devices), a central edge node server, and cloud servers for managing patient data in a healthcare environment.
+
+---
+
+### **System Overview**
+The project involves the deployment of a **three-layer architecture** for handling patient data generated from various edge nodes (e.g., IoT devices and wearables). The system integrates with a **central edge node server** to process anonymized data locally and transmits this data to the **cloud layer** for further processing, storage, or integration with external services.
+
+---
+
+### **Architectural Layers and Concepts**
+
+#### **1. Edge Layer (Decentralized, Closest to the Data Source)**
+   - **Edge Nodes**:
+     - Each node represents a web server running on IoT devices, wearables, or other edge devices.
+     - Devices can include health trackers, mobile apps, or connected medical equipment.
+     - **Data Collected**: Raw patient data such as vitals, sensor readings, and health metrics.
+     - **Computing Tasks**: Initial processing of raw patient data, which includes capturing and cleaning the data before transmitting it.
+     - **API Responsibility**: 
+       - **CRUD operations for `PatientData`**: Each edge node creates, reads, updates, and deletes patient data locally.
+   
+   - **Wearables**:
+     - Specialized edge nodes (e.g., fitness trackers, smartwatches) that collect real-time patient health metrics.
+     - Transmit patient data back to the central node for further processing.
+
+---
+
+#### **2. Fog Layer (Intermediary, Localized Processing)**
+   - **Central Edge Node Server**:
+     - This is the **main node server** that acts as a local server for the system, aggregating data from all connected edge nodes (IoT devices, wearables, etc.).
+     - **Responsibilities**:
+       - **Anonymization**: `AnomizedPatientData` is created at the central node server. Patient identifiers are removed or encrypted to ensure privacy and meet compliance standards.
+       - **Data Aggregation**: Consolidates data from various edge nodes, performs additional processing (e.g., data validation, encryption), and prepares it for offloading to the cloud.
+     - **API Responsibility**:
+       - Anonymizes the collected patient data.
+       - Sends `AnomizedPatientData` to the cloud server.
+       - Coordinates the communication between individual nodes (IoT devices) and the cloud.
+
+---
+
+#### **3. Cloud Layer (Centralized, High-Processing)**
+   - **Cloud Computing**:
+     - The cloud server is responsible for handling large-scale processing and long-term storage.
+     - **External Integration**: The cloud can connect to external services or APIs to support additional healthcare functions (e.g., predictive analytics, machine learning models, external healthcare systems).
+     - **Data Offloading**:
+       - Receives `AnomizedPatientData` from the central edge node server.
+       - **High Latency**: Due to the remote nature of the cloud, there may be some latency when compared to localized edge nodes.
+       - **Containerized Service**: The cloud server can run in a **Docker container** as part of a microservices architecture, allowing easy scaling, deployment, and management.
+     - **API Responsibility**:
+       - Accepts anonymized patient data from the edge node server.
+       - Stores the processed data and integrates with other services for further analysis (e.g., predictive healthcare models, long-term data storage, etc.).
+
+---
+
+### **APIs Overview**
+The system will expose several APIs for handling patient data at different layers of the architecture:
+
+#### **1. CRUD Operations for PatientData (Edge Node Layer)**:
+   - **CreatePatientData**: 
+     - API to create new patient records from IoT devices, wearables, and other edge devices.
+     - Stores raw patient data locally at each node.
+   - **ReadPatientData**: 
+     - Fetch patient data from the edge nodes.
+   - **UpdatePatientData**: 
+     - Modify existing patient data at the edge nodes.
+   - **DeletePatientData**: 
+     - Remove patient data from the edge nodes once it is no longer needed.
+
+#### **2. Anonymized Patient Data (Central Edge Node Server Layer)**:
+   - **CreateAnonymizedPatientData**:
+     - Collects patient data from multiple edge nodes.
+     - Processes and anonymizes the data (removing personally identifiable information).
+   - **SendAnonymizedPatientDataToCloud**:
+     - Sends the anonymized patient data to the cloud for further processing and long-term storage.
+
+#### **3. Cloud Integration (Cloud Layer)**:
+   - **ReceiveAnonymizedPatientData**:
+     - Accepts incoming anonymized patient data from the edge node server.
+     - Stores the data for further processing or analysis.
+
+---
+
+### **Data Flow**
+
+1. **Data Collection at Edge Nodes**:
+   - Wearables, IoT devices, or edge nodes collect patient data (e.g., vitals).
+   - The data is initially stored locally on each edge node.
+
+2. **Anonymization at the Central Edge Node Server**:
+   - The central edge node server aggregates data from multiple edge nodes.
+   - Anonymization of the patient data occurs here, ensuring compliance with data privacy standards (e.g., GDPR, HIPAA).
+
+3. **Offloading to the Cloud**:
+   - Once anonymized, the data is sent to the cloud server.
+   - The cloud handles further processing (e.g., integration with external services, long-term storage, or running AI models for predictive analytics).
+
+---
+
+### **Security and Privacy Considerations**
+- **Data Anonymization**: Patient data must be anonymized at the edge or central edge node to ensure privacy and meet legal regulations.
+- **Data Encryption**: All data transmitted between nodes, the central server, and the cloud should be encrypted (e.g., using TLS/SSL).
+- **Authentication and Authorization**: Secure access to the API should be enforced, ensuring that only authorized devices can transmit patient data.
+- **Compliance**: The system must meet healthcare compliance standards like HIPAA, GDPR, ensuring data privacy and security.
+
+---
+
+### **Advantages of This Architecture**
+- **Reduced Latency**: By processing data locally at the edge and central node server, latency is minimized compared to traditional cloud-only systems.
+- **Improved Scalability**: The decentralized nature of the architecture enables scalability by adding more edge nodes and allowing the central edge node server to manage local networks.
+- **Enhanced Security**: Sensitive patient data is anonymized before being sent to the cloud, reducing the risk of data breaches.
+- **Edge-Centric Processing**: Real-time or near-real-time processing is performed closer to the data source (at the edge), improving responsiveness.
+
+---
+
+### **Next Steps**
+1. Define API endpoints for CRUD operations at the edge node level.
+2. Implement anonymization logic at the central edge node server.
+3. Set up cloud services (e.g., AWS, Azure) to receive and process anonymized data.
+4. Design the Docker container for the cloud server, ensuring smooth deployment and scaling.
+
+Simulate all thse by spinning docker web servers individually using a single docker file
