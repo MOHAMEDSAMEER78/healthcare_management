@@ -4,7 +4,7 @@ services:
   edge_node:
     build:
       context: .
-      dockerfile: Dockerfile.edge
+      dockerfile: edge_node/Dockerfile.edge
     ports:
       - "8000:8000"
     environment:
@@ -13,7 +13,7 @@ services:
   central_node:
     build:
       context: .
-      dockerfile: Dockerfile.central
+      dockerfile: central_edge_node/Dockerfile.central
     ports:
       - "8001:8001"
     environment:
