@@ -7,4 +7,3 @@ from .serializers import AnonymizedPatientDataSerializer
 class AnonymizedPatientDataViewSet(viewsets.ModelViewSet):
     queryset = AnonymizedPatientData.objects.all()
     serializer_class = AnonymizedPatientDataSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Optional: Add authentication permissions
