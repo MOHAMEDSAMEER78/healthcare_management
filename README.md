@@ -92,4 +92,4 @@ python -m venv cloud_server_env
 source cloud_server_env/bin/activate
 
 python -m venv central_edge_node_env
-source central_edge_node_env/bin/activate# calendarApp
+source central_edge_node_env/bin/activate
