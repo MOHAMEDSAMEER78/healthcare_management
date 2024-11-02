@@ -4,6 +4,7 @@ from django.db import models
 
 class AnonymizedPatientData(models.Model):
     patient_id = models.IntegerField()  # Regular integer field 
+    patient_original_data_id = models.IntegerField(unique=True)  # Add this field to store the original PatientData ID
     name = models.CharField(max_length=100, blank=True)
     age = models.IntegerField()
     heartrate = models.IntegerField(blank=True)
