@@ -30,5 +30,13 @@ RUN echo "Current working directory:" && pwd
 # Expose port 8000 for the Django app
 EXPOSE 8001
 
-# Run Django's development server
-CMD ["sh", "-c", "python manage.py makemigrations && python manage.py runserver 0.0.0.0:8001"]
+# Create a shell script to run migrations and start the server
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'python manage.py makemigrations' >> /app/start.sh && \
+    echo 'python manage.py migrate' >> /app/start.sh && \
+    echo 'python manage.py runserver 0.0.0.0:8001' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
+    
+# Run the shell script
+CMD ["/app/start.sh"]
