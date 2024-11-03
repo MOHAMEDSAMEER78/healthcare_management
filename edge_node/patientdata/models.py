@@ -5,6 +5,7 @@ from django.db import models
 class PatientData(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, blank=True)
+    edge_device_name = models.CharField(max_length=100, blank=True)
     age = models.IntegerField() 
     heartrate = models.IntegerField(null=True, blank=True)
     temperature = models.FloatField(null=True, blank=True)

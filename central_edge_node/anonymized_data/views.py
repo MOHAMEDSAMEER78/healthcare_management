@@ -1,6 +1,6 @@
 # anonymized_data/views.py
 
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets
 from .models import AnonymizedPatientData
 from .serializers import AnonymizedPatientDataSerializer
 
