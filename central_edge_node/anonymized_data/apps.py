@@ -1,6 +1,9 @@
 from django.apps import AppConfig
-
+from .kafka_consumer import consume_kafka
 
 class AnonymizedDataConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
     name = 'anonymized_data'
+
+    def ready(self):
+        from .kafka_consumer import consume_kafka
+        consume_kafka()

@@ -15,6 +15,10 @@ RUN apt-get update && apt-get install -y \
 COPY central_edge_node/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+
+# Install Kafka Python client
+RUN pip install kafka-python
+
 # Copy the project files into the container
 COPY central_edge_node/ .
 

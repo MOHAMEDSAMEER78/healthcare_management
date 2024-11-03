@@ -6,6 +6,17 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import PatientData
 from .serializers import PatientDataSerializer
+from kafka import KafkaProducer
+import json
+
+def send_to_kafka(topic, data):
+    producer = KafkaProducer(
+        bootstrap_servers='kafka:9092',
+        value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    )
+    producer.send(topic, data)
+    print('Patient Data sent to Kafka')
+    producer.flush()
 
 @api_view(['GET', 'POST'])
 def patient_data_list(request):
@@ -18,6 +29,8 @@ def patient_data_list(request):
         serializer = PatientDataSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            # Send data to Kafka
+            send_to_kafka('patient_data', serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

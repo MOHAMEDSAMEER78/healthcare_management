@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'anonymized_data',
-
+    # 'consume_kafka',  # Removed consume_kafka as it is a Python file, not a Django app
 ]
 
 MIDDLEWARE = [
