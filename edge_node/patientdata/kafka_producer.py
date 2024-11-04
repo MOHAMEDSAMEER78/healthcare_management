@@ -23,7 +23,7 @@ class PatientDataProducer:
                     value_serializer=lambda v: json.dumps(v).encode('utf-8'),
                     api_version=(0, 10, 1),
                     retries=3,
-                    retry_backoff_ms=1000,
+                    retry_backoff_ms=10,
                     request_timeout_ms=30000
                 )
                 print(f"Successfully connected to Kafka at {bootstrap_servers}")

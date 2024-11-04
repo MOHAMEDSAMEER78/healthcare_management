@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class PatientDataConsumer(threading.Thread):
     print("Starting PatientDataConsumer")
-    def __init__(self, max_retries=5, retry_interval=5):
+    def __init__(self, max_retries=2, retry_interval=1):
         threading.Thread.__init__(self)
         self.stop_event = threading.Event()
         self.max_retries = max_retries
@@ -40,8 +40,8 @@ class PatientDataConsumer(threading.Thread):
                     value_deserializer=lambda x: json.loads(x.decode('utf-8')),
                     group_id='central_node_group',
                     api_version=(0, 10, 1),
-                    session_timeout_ms=30000,
-                    request_timeout_ms=30000
+                    session_timeout_ms=300,
+                    request_timeout_ms=300
                 )
             except NoBrokersAvailable:
                 retries += 1
