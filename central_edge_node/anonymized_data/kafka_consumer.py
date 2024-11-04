@@ -1,5 +1,5 @@
 from kafka import KafkaConsumer
-from kafka.errors import NoBrokersAvailable,KafkaConfigurationError
+from kafka.errors import NoBrokersAvailable, KafkaConfigurationError, KafkaError
 import json
 from django.conf import settings
 from .models import AnonymizedPatientData
@@ -74,6 +74,14 @@ class PatientDataConsumer(threading.Thread):
                         AnonymizedPatientData.objects.create(**anonymized_data)
                     except Exception as e:
                         logger.error(f"Error processing message: {e}")
+            except ConnectionResetError as e:
+                logger.error(f"Connection reset error: {e}")
+                time.sleep(self.retry_interval)
+                consumer = self._create_consumer()  # Recreate the consumer after connection reset
+                logger.info("Reconnected to Kafka after connection reset")
+            except KafkaError as e:
+                logger.error(f"Kafka error: {e}")
+                time.sleep(self.retry_interval)
             except Exception as e:
                 logger.error(f"Consumer error: {e}")
                 time.sleep(self.retry_interval)
