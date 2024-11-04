@@ -2,7 +2,7 @@ from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable, KafkaConfigurationError, KafkaError
 import json
 from django.conf import settings
-from .models import AnonymizedPatientData
+from anonymized_data.models import AnonymizedPatientData
 import threading
 import time
 import logging
@@ -69,9 +69,10 @@ class PatientDataConsumer(threading.Thread):
                         data = message.value
                         print(data)
                         logger.info(f"Received message: {data}")
-                        anonymized_data = self.anonymize_data(data)
-                        print("anonymized data : ",anonymized_data)
-                        AnonymizedPatientData.objects.create(**anonymized_data)
+                        #anonymized_data = self.anonymize_data(data)
+                        #print("anonymized data : ",anonymized_data)
+                        #AnonymizedPatientData.objects.create(**anonymized_data)
+                        logger.info("Data received from Kafka: ", data)
                     except Exception as e:
                         logger.error(f"Error processing message: {e}")
             except ConnectionResetError as e:

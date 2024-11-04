@@ -20,3 +20,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # from anonymized_data.kafka_consumer import PatientDataConsumer
+    # listener = PatientDataConsumer()
+    # listener.start()
