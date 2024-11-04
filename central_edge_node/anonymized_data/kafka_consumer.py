@@ -70,6 +70,7 @@ class PatientDataConsumer(threading.Thread):
                         print(data)
                         logger.info(f"Received message: {data}")
                         anonymized_data = self.anonymize_data(data)
+                        print("anonymized data : ",anonymized_data)
                         AnonymizedPatientData.objects.create(**anonymized_data)
                     except Exception as e:
                         logger.error(f"Error processing message: {e}")
