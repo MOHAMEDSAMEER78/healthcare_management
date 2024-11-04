@@ -2,6 +2,7 @@ from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable, KafkaConfigurationError, KafkaError
 import json
 from django.conf import settings
+from rest_framework import serializers
 from .models import AnonymizedPatientData
 import threading
 import time
@@ -95,18 +96,16 @@ class PatientDataConsumer(threading.Thread):
         anonymized = {}
         anonymized['patient_original_data_id'] = str(data.get('id', ''))
         anonymized['edge_device_name'] = 'Edge Device 1'
-        print("anonymized data : ",anonymized)
         
         # Map and anonymize other fields
         field_mapping = {
             'id': 'patient_original_data_id',  # Map id to patient_original_data_id
             'name': 'name',
             'age': 'age',
-            'heart_rate': 'heart_rate',
+            'heart_rate': 'heartrate',  # Correctly map heart_rate to heartrate
             'blood_pressure': 'blood_pressure',
             'temperature': 'temperature',
             'oxygen_level': 'oxygen_level',
-            'timestamp': 'timestamp',
             'date': 'date',
             'time': 'time'
         }
@@ -115,6 +114,9 @@ class PatientDataConsumer(threading.Thread):
         for source, target in field_mapping.items():
             if source in data:
                 anonymized[target] = data[source]
-                
-      
+        
+        # Optionally handle heartrate separately if needed
+        if 'heart_rate' in data:
+            anonymized['heartrate'] = data['heart_rate']  # Ensure heartrate is included
+
         return anonymized
