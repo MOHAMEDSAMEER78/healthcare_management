@@ -54,6 +54,17 @@ services:
       - edge_node
     restart: unless-stopped
 
+  central_node_kafka_consumer:
+    build:
+      context: .
+      dockerfile: central_edge_node/Dockerfile.kafka_consumer
+    environment:
+      - DJANGO_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - central_node
+    restart: unless-stopped
+
   cloud_server:
     build:
       context: .
