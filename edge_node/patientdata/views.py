@@ -7,8 +7,20 @@ from rest_framework import status
 from .models import PatientData
 from .serializers import PatientDataSerializer
 from .kafka_producer import PatientDataProducer
-
 kafka_producer = PatientDataProducer()
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()  # This ensures logs go to stdout
+    ]
+)
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 @api_view(['GET', 'POST'])
 def patient_data_list(request):
@@ -22,6 +34,7 @@ def patient_data_list(request):
         if serializer.is_valid():
             serializer.save()
             # Send to Kafka after saving
+            logger.info(f"Sending data to Kafka: {serializer.data}")    
             print(f"Sending data to Kafka: {serializer.data}")
             kafka_producer.send_patient_data(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -1,5 +1,5 @@
 from kafka import KafkaConsumer
-from kafka.errors import NoBrokersAvailable
+from kafka.errors import NoBrokersAvailable,KafkaConfigurationError
 import json
 from django.conf import settings
 from .models import AnonymizedPatientData
@@ -34,26 +34,29 @@ class PatientDataConsumer(threading.Thread):
         retries = 0
         while retries < self.max_retries:
             try:
+                logger.info("Connecting to Kafka...")
                 return KafkaConsumer(
                     'patient_data',
-                    bootstrap_servers=['localhost:9092'],
+                    bootstrap_servers=['kafka:9092'],
                     value_deserializer=lambda x: json.loads(x.decode('utf-8')),
                     group_id='central_node_group',
                     api_version=(0, 10, 1),
-                    session_timeout_ms=300,
-                    request_timeout_ms=300
+                    session_timeout_ms=45000,          # Session timeout
+                    heartbeat_interval_ms=14000,       # Less than session_timeout_ms/3
+                    request_timeout_ms=60000,          # Larger than session_timeout_ms
+                    fetch_max_wait_ms=500,
+                    connections_max_idle_ms=600000,
+                    auto_offset_reset='earliest'
                 )
             except NoBrokersAvailable:
+                logger.error("Failed to create consumer: NoBrokersAvailable")
                 retries += 1
-                if retries < self.max_retries:
-                    logger.warning(f"Failed to connect to Kafka. Retrying in {self.retry_interval} seconds...")
-                    time.sleep(self.retry_interval)
-                else:
-                    logger.error("Max retries reached. Could not connect to Kafka")
-                    raise
+                time.sleep(self.retry_interval)
+        raise KafkaConfigurationError("Failed to create Kafka consumer after retries")
 
     def run(self):
         try:
+            logger.info("Starting Kafka consumer...")
             consumer = self._create_consumer()
         except Exception as e:
             logger.error(f"Failed to create consumer: {e}")
@@ -64,6 +67,7 @@ class PatientDataConsumer(threading.Thread):
                 for message in consumer:
                     try:
                         data = message.value
+                        print(data)
                         logger.info(f"Received message: {data}")
                         anonymized_data = self.anonymize_data(data)
                         AnonymizedPatientData.objects.create(**anonymized_data)
@@ -80,12 +84,9 @@ class PatientDataConsumer(threading.Thread):
         Anonymize patient data by mapping fields and replacing identifiers
         """
         anonymized = {}
-        
-        # Create anonymized device ID
-        device_prefix = "DEVICE"
-        device_hash = hash(str(data.get('device_id', ''))) % 10000  # Get last 4 digits
-        anonymized['device_id'] = f"{device_prefix}_{device_hash:04d}"
-        anonymized['device_name'] = data.get('device_name', 'Unknown')
+        anonymized['patient_original_data_id'] = str(data.get('id', ''))
+        anonymized['edge_device_name'] = 'Edge Device 1'
+        print("anonymized data : ",anonymized)
         
         # Map and anonymize other fields
         field_mapping = {
@@ -106,11 +107,5 @@ class PatientDataConsumer(threading.Thread):
             if source in data:
                 anonymized[target] = data[source]
                 
-        # Remove or anonymize any PII fields
-        if 'name' in data:
-            anonymized['patient_id'] = f"PAT_{hash(data['name']) % 10000:04d}"
-            
-        if 'location' in data:
-            anonymized['region'] = hash(data['location']) % 100  # Convert to region number
-            
+      
         return anonymized

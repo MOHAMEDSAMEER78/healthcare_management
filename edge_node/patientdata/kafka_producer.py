@@ -3,7 +3,19 @@ from kafka.errors import NoBrokersAvailable
 import json
 import time
 from django.conf import settings
+import logging
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()  # This ensures logs go to stdout
+    ]
+)
+
+# Set up logger
+logger = logging.getLogger(__name__)
 class PatientDataProducer:
     def __init__(self, max_retries=2, retry_interval=1):
         self.max_retries = max_retries
@@ -14,7 +26,7 @@ class PatientDataProducer:
 
     def _connect(self):
         retries = 0
-        bootstrap_servers = ['localhost:9092']
+        bootstrap_servers = ['kafka:9092']
         
         while retries < self.max_retries:
             try:
@@ -47,10 +59,10 @@ class PatientDataProducer:
                 return False
 
         try:
-            print(f"Sending message to Kafka: {data}")
+            logger.info(f"Sending message to Kafka: {data}")
             future = self.producer.send(self.topic, data)
             future.get(timeout=10)  # Wait for send to complete
-            print("Message sent successfully")
+            logger.info("Message sent successfully")
             return True
         except Exception as e:
             print(f"Error sending message to Kafka: {e}")
