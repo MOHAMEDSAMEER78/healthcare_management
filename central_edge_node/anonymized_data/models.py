@@ -3,7 +3,7 @@
 from django.db import models
 
 class AnonymizedPatientData(models.Model):
-    patient_id = models.IntegerField()  # Regular integer field 
+    id = models.AutoField(primary_key=True)  # Regular integer field 
     patient_original_data_id = models.IntegerField(unique=True)  # Regular integer field
     edge_device_name = models.CharField(max_length=100, blank=True)
     name = models.CharField(max_length=100, blank=True)

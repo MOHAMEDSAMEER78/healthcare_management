@@ -38,6 +38,7 @@ services:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - kafka
+      - zookeeper
     restart: unless-stopped
 
   central_node:
@@ -50,7 +51,6 @@ services:
       - DJANGO_ENV=development
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
-      - kafka
       - edge_node
     restart: unless-stopped
 
