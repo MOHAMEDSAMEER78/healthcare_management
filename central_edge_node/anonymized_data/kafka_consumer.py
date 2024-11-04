@@ -3,9 +3,13 @@ from kafka.errors import NoBrokersAvailable, KafkaConfigurationError, KafkaError
 import json
 from django.conf import settings
 from anonymized_data.models import AnonymizedPatientData
+from .serializers import AnonymizedPatientDataSerializer
+
 import threading
 import time
 import logging
+from django.forms.models import model_to_dict
+
 
 # Configure logging
 logging.basicConfig(
@@ -67,12 +71,23 @@ class PatientDataConsumer(threading.Thread):
                 for message in consumer:
                     try:
                         data = message.value
-                        print(data)
                         logger.info(f"Received message: {data}")
-                        anonymized_data = self.anonymize_data(data)
-                        print("anonymized data : ",anonymized_data)
-                        AnonymizedPatientData.objects.create(**anonymized_data)
-                        logger.info("Data received from Kafka: ", data)
+                        anonymized_data_json = self.anonymize_data(data)
+                        logger.info(f"Anonymized data final: {anonymized_data_json}")
+
+                        logger.info(f"Anonymized data JSON: {anonymized_data_json}")
+
+                        # Serialize the anonymized data
+                        serializer = AnonymizedPatientDataSerializer(data=anonymized_data_json)
+                        logger.info(f"Serializer: {serializer}")
+
+                        # Check if the serialization is valid
+                        if serializer.is_valid():
+                            # Save the serialized data to the database
+                            serializer.save()
+                        else:
+                            logger.error(f"Error serializing anonymized data: {serializer.errors}")
+                        logger.info(f"Data received from Kafka: {data}")
                     except Exception as e:
                         logger.error(f"Error processing message: {e}")
             except ConnectionResetError as e:
@@ -94,28 +109,20 @@ class PatientDataConsumer(threading.Thread):
         Anonymize patient data by mapping fields and replacing identifiers
         """
         anonymized = {}
-        anonymized['patient_original_data_id'] = str(data.get('id', ''))
+        logger.error(f"Starting data anonymization: {data}")
+        
+        # Anonymize sensitive fields
+        anonymized['patient_original_data_id'] = int(data.get('id', ''))
+        anonymized['age'] = int(data.get('age', 0))
+        anonymized['blood_pressure'] = str(data.get('blood_pressure', "120/80"))
+        anonymized['temperature'] = float(data.get('temperature', 0.0))
+        anonymized['glucose_level'] = float(data.get('glucose_level', 0.0))
+        anonymized['heartrate'] = int(data.get('heartrate', 0))
+        anonymized['oxygen_level'] = float(data.get('oxygen_level', 0.0))
         anonymized['edge_device_name'] = 'Edge Device 1'
-        print("anonymized data : ",anonymized)
-        
-        # Map and anonymize other fields
-        field_mapping = {
-            'id': 'patient_original_data_id',  # Map id to patient_original_data_id
-            'name': 'name',
-            'age': 'age',
-            'heart_rate': 'heart_rate',
-            'blood_pressure': 'blood_pressure',
-            'temperature': 'temperature',
-            'oxygen_level': 'oxygen_level',
-            'timestamp': 'timestamp',
-            'date': 'date',
-            'time': 'time'
-        }
-        
-        # Copy non-sensitive data fields
-        for source, target in field_mapping.items():
-            if source in data:
-                anonymized[target] = data[source]
-                
-      
+        anonymized['name'] = 'Anonymous'
+        anonymized['date'] = (data.get('date', ''))
+        anonymized['time'] = (data.get('time', ''))
+
+        logger.error(f"Anonymized data: {anonymized}")
         return anonymized

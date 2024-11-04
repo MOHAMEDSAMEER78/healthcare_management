@@ -4,7 +4,7 @@ from django.db import models
 
 class AnonymizedPatientData(models.Model):
     id = models.AutoField(primary_key=True)  # Regular integer field 
-    patient_original_data_id = models.IntegerField(unique=True)  # Regular integer field
+    patient_original_data_id = models.IntegerField(blank=True)  # Regular integer field
     edge_device_name = models.CharField(max_length=100, blank=True)
     name = models.CharField(max_length=100, blank=True)
     age = models.IntegerField()
