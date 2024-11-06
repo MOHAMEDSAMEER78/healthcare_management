@@ -34,9 +34,8 @@ def patient_data_list(request):
         if serializer.is_valid():
             serializer.save()
             # Send to Kafka after saving
-            logger.info(f"Sending data to Kafka: {serializer.data}")    
-            print(f"Sending data to Kafka: {serializer.data}")
-            kafka_producer.send_patient_data(serializer.data)
+            logger.info(f"Sending data to Kafka: {request.data}")
+            kafka_producer.send_patient_data(request.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

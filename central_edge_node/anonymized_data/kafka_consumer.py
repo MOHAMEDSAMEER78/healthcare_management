@@ -4,12 +4,14 @@ import json
 from django.conf import settings
 from anonymized_data.models import AnonymizedPatientData
 from .serializers import AnonymizedPatientDataSerializer
+from .services import process_patient_data
 
 import threading
 import time
 import logging
 from django.forms.models import model_to_dict
 from django.db import models
+import requests
 
 
 # Configure logging
@@ -72,18 +74,10 @@ class PatientDataConsumer(threading.Thread):
                 for message in consumer:
                     try:
                         data = message.value
+                        #data['name'] = 'Anonymous'
                         logger.info(f"Received message: {data}")
-                        anonymized_data_json = self.anonymize_data(data)
-                        logger.info(f"Anonymized data final: {anonymized_data_json}")
-
-                        serializer = AnonymizedPatientDataSerializer(data=anonymized_data_json)
-                
-                        if serializer.is_valid():
-                            serializer.save()
-                        else:
-                            logger.error(f"Error serializing anonymized data: {serializer.errors}")
-                        
-                        logger.info(f"Data received from Kafka: {data}")
+                        # Call the service layer method
+                        process_patient_data(data)
                     except Exception as e:
                         logger.error(f"Error processing message: {e}")
             except ConnectionResetError as e:
@@ -99,27 +93,3 @@ class PatientDataConsumer(threading.Thread):
                 time.sleep(self.retry_interval)
 
         consumer.close()
-
-    def anonymize_data(self, data):
-        """
-        Anonymize patient data by mapping fields and replacing identifiers
-        """
-        anonymized = {}
-        logger.error(f"Starting data anonymization: {data}")
-        
-        # Anonymize sensitive fields
-        #anonymized['id'] =  (data.get('id',1))
-        anonymized['patient_original_data_id'] = (data.get('id', 1))
-        anonymized['edge_device_name'] = 'Edge Device 1'
-        anonymized['name'] = 'Anonymous'
-        anonymized['age'] =  (data.get('age', 0))
-        anonymized['heartrate'] =  (data.get('heartrate', 0))
-        anonymized['temperature'] =  (data.get('temperature', 99.0))
-        anonymized['blood_pressure'] =  (data.get('blood_pressure', "120/80"))
-        anonymized['glucose_level'] =  (data.get('glucose_level', 100))
-        anonymized['oxygen_level'] =  (data.get('oxygen_level', 0.0))
-        anonymized['date'] =  (data.get('date', "2024-10-20"))
-        anonymized['time'] =  (data.get('time', "14:00:00"))
-
-        logger.error(f"Anonymized data: {anonymized}")
-        return anonymized
