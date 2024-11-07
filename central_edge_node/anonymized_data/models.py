@@ -15,3 +15,4 @@ class AnonymizedPatientData(models.Model):
     oxygen_level = models.FloatField(blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     time = models.TimeField(blank=True, null=True)
+

@@ -1,17 +1,11 @@
 from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable, KafkaConfigurationError, KafkaError
 import json
-from django.conf import settings
-from anonymized_data.models import AnonymizedPatientData
-from .serializers import AnonymizedPatientDataSerializer
 from .services import process_patient_data
 
 import threading
 import time
 import logging
-from django.forms.models import model_to_dict
-from django.db import models
-import requests
 
 
 # Configure logging
@@ -74,7 +68,6 @@ class PatientDataConsumer(threading.Thread):
                 for message in consumer:
                     try:
                         data = message.value
-                        #data['name'] = 'Anonymous'
                         logger.info(f"Received message: {data}")
                         # Call the service layer method
                         process_patient_data(data)
