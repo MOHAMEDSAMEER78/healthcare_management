@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install kafka-python
 RUN pip install requests
 Run pip install psycopg2
+RUN pip install cryptography
 
 
 # Copy the project files into the container

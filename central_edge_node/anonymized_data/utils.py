@@ -3,6 +3,8 @@ from django.forms.models import model_to_dict
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+
+from utils import protect_identity
 from .models import AnonymizedPatientData
 from .serializers import AnonymizedPatientDataSerializer
 
@@ -37,5 +39,5 @@ def save_patient_data(data):
 
 def anonymize_data(data):
     # Anonymize data here
-    data['name'] = "Anonymized"
+    data['name'] = "Anonymized "+ protect_identity(data['name'])
     return data
