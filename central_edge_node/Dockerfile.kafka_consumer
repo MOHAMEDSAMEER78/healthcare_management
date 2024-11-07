@@ -27,24 +27,12 @@ Run pip install psycopg2
 # Copy the project files into the container
 COPY central_edge_node/ .
 
-# Debug: List contents of /app
-RUN echo "Contents of /app:" && ls -la /app
-
-# Debug: List contents of /app recursively
-RUN echo "Recursive contents of /app:" && find /app
-
-# Debug: Print current working directory
-RUN echo "Current working directory:" && pwd
-
-# Expose port 8000 for the Django app
-EXPOSE 8001
-
-# Create a shell script to run migrations and start the server
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'python manage.py makemigrations' >> /app/start.sh && \
-    echo 'python manage.py migrate' >> /app/start.sh && \
-    echo 'python manage.py runserver 0.0.0.0:8001' >> /app/start.sh && \
-    chmod +x /app/start.sh
+# Create a shell script to start the Kafka consumer
+RUN echo '#!/bin/sh' > /app/start_kafka_consumer.sh && \
+    echo 'python manage.py makemigrations' >> /app/start_kafka_consumer.sh && \
+    echo 'python manage.py migrate' >> /app/start_kafka_consumer.sh && \
+    echo 'python manage.py start_kafka_consumer' >> /app/start_kafka_consumer.sh && \
+    chmod +x /app/start_kafka_consumer.sh
 
 # Run the shell script
-CMD ["/app/start.sh"]
+CMD ["/app/start_kafka_consumer.sh"]

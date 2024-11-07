@@ -1,4 +1,32 @@
+# docker-compose.yml
+version: "3.8"
 services:
+  zookeeper:
+    restart: always
+    image: docker.io/bitnami/zookeeper:3.8
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper-volume:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    restart: always
+    image: docker.io/bitnami/kafka:3.3
+    ports:
+      - "9093:9093"
+    volumes:
+      - "kafka-volume:/bitnami"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
   edge_node:
     build:
       context: .
@@ -7,6 +35,15 @@ services:
       - "8000:8000"
     environment:
       - DJANGO_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_DB=healthcare_db
+      - POSTGRES_USER=healthcare_user
+      - POSTGRES_PASSWORD=healthcare_password
+      - POSTGRES_HOST=db
+    depends_on:
+      - kafka
+      - zookeeper
+    restart: unless-stopped
 
   central_node:
     build:
@@ -16,8 +53,33 @@ services:
       - "8001:8001"
     environment:
       - DJANGO_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_DB=healthcare_db
+      - POSTGRES_USER=healthcare_user
+      - POSTGRES_PASSWORD=healthcare_password
+      - POSTGRES_HOST=db
     depends_on:
       - edge_node
+    restart: unless-stopped
+    volumes:
+      - ./central_node/db.sqlite3:/app/db/db.sqlite3
+
+  central_node_kafka_consumer:
+    build:
+      context: .
+      dockerfile: central_edge_node/Dockerfile.kafka_consumer
+    environment:
+      - DJANGO_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_DB=healthcare_db
+      - POSTGRES_USER=healthcare_user
+      - POSTGRES_PASSWORD=healthcare_password
+      - POSTGRES_HOST=db
+    depends_on:
+      - central_node
+    restart: unless-stopped
+    volumes:
+      - ./central_node/db.sqlite3:/app/db/db.sqlite3:shared
 
   cloud_server:
     build:
@@ -27,5 +89,30 @@ services:
       - "8002:8002"
     environment:
       - DJANGO_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_DB=healthcare_db
+      - POSTGRES_USER=healthcare_user
+      - POSTGRES_PASSWORD=healthcare_password
+      - POSTGRES_HOST=db
     depends_on:
       - central_node
+    restart: unless-stopped
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: healthcare_db
+      POSTGRES_USER: healthcare_user
+      POSTGRES_PASSWORD: healthcare_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  kafka-volume:
+  zookeeper-volume:
+  central_node_db:
+  postgres-data:
