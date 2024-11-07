@@ -15,6 +15,7 @@ def save_patient_data(data):
         anonymized_patient_data = AnonymizedPatientData(**data)
         dictx = model_to_dict(anonymized_patient_data)
         dictx['patient_original_data_id'] = data['id']
+        dictx = anonymize_data(dictx)
         logger.info("Anonymized patient data object: {}".format(dictx))
 
         serializer = AnonymizedPatientDataSerializer(data=dictx)
@@ -32,3 +33,9 @@ def save_patient_data(data):
     except Exception as e:
         logger.error(f"Error saving patient data: {e}", exc_info=True)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+def anonymize_data(data):
+    # Anonymize data here
+    data['name'] = "Anonymized"
+    return data
