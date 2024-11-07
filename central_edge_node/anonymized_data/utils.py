@@ -3,7 +3,7 @@ from django.forms.models import model_to_dict
 from rest_framework.response import Response
 from rest_framework import status
 
-from central_edge_node.anonymized_data.anonymizer import protect_identity
+from  .anonymizer import protect_identity
 from .models import AnonymizedPatientData
 from .serializers import AnonymizedPatientDataSerializer
 
