@@ -32,7 +32,7 @@ services:
       context: .
       dockerfile: edge_node/Dockerfile.edge
     ports:
-      - "8000:8000"
+      - "8100:8000"
     environment:
       - DJANGO_ENV=development
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -50,7 +50,7 @@ services:
       context: .
       dockerfile: edge_node/Dockerfile.edge
     ports:
-      - "8003:8000"
+      - "8101:8000"
     environment:
       - DJANGO_ENV=development
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -68,7 +68,7 @@ services:
       context: .
       dockerfile: edge_node/Dockerfile.edge
     ports:
-      - "8004:8000"
+      - "8103:8000"
     environment:
       - DJANGO_ENV=development
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
