@@ -32,7 +32,43 @@ services:
       context: .
       dockerfile: edge_node/Dockerfile.edge
     ports:
-      - "8000:8000"
+      - "8100:8000"
+    environment:
+      - DJANGO_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_DB=healthcare_db
+      - POSTGRES_USER=healthcare_user
+      - POSTGRES_PASSWORD=healthcare_password
+      - POSTGRES_HOST=db
+    depends_on:
+      - kafka
+      - zookeeper
+    restart: unless-stopped
+
+  edge_node_2:
+    build:
+      context: .
+      dockerfile: edge_node/Dockerfile.edge
+    ports:
+      - "8101:8000"
+    environment:
+      - DJANGO_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_DB=healthcare_db
+      - POSTGRES_USER=healthcare_user
+      - POSTGRES_PASSWORD=healthcare_password
+      - POSTGRES_HOST=db
+    depends_on:
+      - kafka
+      - zookeeper
+    restart: unless-stopped
+
+  edge_node_3:
+    build:
+      context: .
+      dockerfile: edge_node/Dockerfile.edge
+    ports:
+      - "8103:8000"
     environment:
       - DJANGO_ENV=development
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
