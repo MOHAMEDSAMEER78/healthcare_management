@@ -93,3 +93,8 @@ source cloud_server_env/bin/activate
 
 python -m venv central_edge_node_env
 source central_edge_node_env/bin/activate
+
+
+
+Kibana Dashboard
+http://localhost:5601/app/discover#/?_a=(columns:!(),dataSource:(type:esql),filters:!(),interval:auto,query:(esql:'FROM%20anonymized_patient_data%20%7C%20LIMIT%2010'),sort:!())&_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-15m,to:now))
