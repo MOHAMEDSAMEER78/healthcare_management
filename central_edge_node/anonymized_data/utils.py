@@ -2,9 +2,8 @@ import logging
 from django.forms.models import model_to_dict
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view
 
-from utils import protect_identity
+from central_edge_node.anonymized_data.anonymizer import protect_identity
 from .models import AnonymizedPatientData
 from .serializers import AnonymizedPatientDataSerializer
 
