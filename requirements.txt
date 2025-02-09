@@ -4,4 +4,6 @@ numpy
 celery
 redis
 kafka-python
+google-generativeai
+request
 

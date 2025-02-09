@@ -1,3 +1,5 @@
 Django>=3.2,<4
 djangorestframework>=3.12,<4
 kafka-python>=2.0.2
+google-generativeai==0.8.4
+requests>=2.31.0
