@@ -1,0 +1,7 @@
+django
+djangorestframework
+numpy
+celery
+redis
+kafka-python
+

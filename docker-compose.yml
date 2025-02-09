@@ -27,6 +27,39 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
     depends_on:
       - zookeeper
+
+   # === OLLAMA LLM SERVICE ===
+  ollama:
+    image: ollama/ollama
+    container_name: ollama-container
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: always
+
+  # === LLM API SERVICE ===
+  llm_api:
+    build:
+      context: .
+      dockerfile: llm_api/Dockerfile.llm_api
+    container_name: django-llm-api
+    ports:
+      - "5003:5003"
+    environment:
+      - DJANGO_ENV=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_DB=healthcare_db
+      - POSTGRES_USER=healthcare_user
+      - POSTGRES_PASSWORD=healthcare_password
+      - POSTGRES_HOST=db
+      - OLLAMA_API_URL=http://ollama:11434/api/generate
+    depends_on:
+      - kafka
+      - zookeeper
+      - ollama
+      - db
+    restart: unless-stopped   
   edge_node:
     build:
       context: .
@@ -231,3 +264,4 @@ volumes:
   postgres-data:
   elasticvolume:
   logstashvolume:
+  ollama_data:
