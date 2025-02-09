@@ -52,7 +52,8 @@ def anonymize_data(config, patient_data):
                     Rules:
                     - Replace real names with generic names
                     - Keep all medical values unchanged
-                    - Keep timestamps and dates unchanged
+                    - Do not include actual knowledge that the remaining information could be used to identify an individual
+                    - Change timestamps and dates
                     - Keep device names unchanged
                     - Return only the JSON object, no explanations
                     """.format(patient_data=str(patient_data))
