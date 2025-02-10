@@ -32,3 +32,4 @@ def save_patient_data(data):
     except Exception as e:
         logger.error(f"Error saving patient data: {e}", exc_info=True)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    

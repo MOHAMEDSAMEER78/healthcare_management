@@ -77,3 +77,4 @@ def get_all_records(request):
 
 # Call init_elasticsearch when the module loads
 init_elasticsearch()
+
