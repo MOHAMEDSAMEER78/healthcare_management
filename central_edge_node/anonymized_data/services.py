@@ -9,7 +9,7 @@ import os
 import logging
 import json
 import requests
-
+from dotenv import load_dotenv
 from .utils import save_patient_data
 
 logger = logging.getLogger(__name__)
@@ -17,8 +17,11 @@ logger = logging.getLogger(__name__)
 def initialize_gemini():
     """Initialize Gemini model configuration"""
     try:
-        api_key = 'AIzaSyBsIZsbvLSI9ArQzWl72FdFgKCzxUCoSs4'
-            
+        load_dotenv()
+        api_key = os.getenv('GEMINI_API_KEY')
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY environment variable is not set")
+        
         base_url = "https://generativelanguage.googleapis.com/v1beta/models"
         model_name = "gemini-1.5-flash"
         

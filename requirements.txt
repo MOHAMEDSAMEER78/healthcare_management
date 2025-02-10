@@ -6,4 +6,5 @@ redis
 kafka-python
 google-generativeai
 request
+python-dotenv
 
