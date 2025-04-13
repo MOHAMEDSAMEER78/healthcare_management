@@ -54,6 +54,8 @@ First, clone this repository to your local machine:
 git clone <repository-url>
 cd <repository-directory>
 
+### Step 2: Create environment variables
+```env (in central_edge_node)
 
 
 ```markdown
