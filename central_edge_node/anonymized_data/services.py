@@ -23,7 +23,7 @@ def initialize_gemini():
             raise ValueError("GEMINI_API_KEY environment variable is not set")
         
         base_url = "https://generativelanguage.googleapis.com/v1beta/models"
-        model_name = "gemini-1.5-flash"
+        model_name = "gemini-2.0-flash"
         
         # Store configuration for use in other functions
         return {
