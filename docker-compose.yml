@@ -1,5 +1,4 @@
 # docker-compose.yml
-version: "3.8"
 services:
   zookeeper:
     restart: always
@@ -115,7 +114,7 @@ services:
       - central_node
     restart: unless-stopped
     volumes:
-      - ./central_node/db.sqlite3:/app/db/db.sqlite3:shared
+      - ./central_node/db.sqlite3:/app/db/db.sqlite3
 
   cloud_server:
     build:
